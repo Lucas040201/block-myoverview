@@ -113,6 +113,7 @@ const getWithEnrolmentEndDate = async courses => {
     const coursesEndDate = await Repository.getUserEnrolmentEndDate({courseIds: courseIds});
     const day = await getString('day', 'theme_boost');
     const days = await getString('days', 'theme_boost');
+    const today = await getString('today', 'theme_boost');
     return courses.map(course => {
         let expirationColor = 'green';
         const currentEndDate = coursesEndDate.find(endDate => Number(course.id) === Number(endDate.courseId))
@@ -126,7 +127,13 @@ const getWithEnrolmentEndDate = async courses => {
             expirationColor = 'red';
         }
         course.expirationColor = expirationColor;
-        course.daysToEnd = (daysToEnd > 1)? `${daysToEnd} ${days}` : `${daysToEnd} ${day}`;
+        if(daysToEnd === 1) {
+            course.daysToEnd = `${daysToEnd} ${day}`;
+        } else if(daysToEnd === 0) {
+            course.daysToEnd = today;
+        } else {
+            course.daysToEnd = `${daysToEnd} ${days}`;
+        }
         return course;
     });
 }
